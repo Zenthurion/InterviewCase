@@ -20,24 +20,24 @@ var parkingProviders: ParkingProvider[] = [];
 
 // localhost:3000/?sizeCategory=2&showers=yes&....
 app.get('/', (req: express.Request, res: express.Response) => {
-    const sizeCategory = parseInt(req.query.size_category as string);
-    const showers = new Boolean(req.query.showers);
+    const sizeCategory: number = parseInt(req.query.size_category as string);
+    const showers: boolean =
+        req.query.showers !== undefined
+            ? JSON.parse(req.query.showers as string)
+            : undefined;
 
     res.send(
         parkingAreas.filter((area) => {
             return (
-                area.parkingSizeCategory === sizeCategory &&
-                (showers
-                    ? area.facilityInformation.showers > 0
-                    : area.facilityInformation.showers === 0)
+                (req.query.size_category === undefined ||
+                    area.parkingSizeCategory === sizeCategory) &&
+                (req.query.showers === undefined ||
+                    (showers
+                        ? area.facilityInformation.showers > 0
+                        : area.facilityInformation.showers === 0))
             );
         })
     );
-
-    // 1. iterate over all params
-    // 2. validate parameter and value
-    // 3. compose query from valid parameters
-    // 4. return result
 });
 
 getParkingProviders();
